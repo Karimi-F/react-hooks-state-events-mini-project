@@ -1,20 +1,12 @@
 import React from "react";
 
-function Task({task, onDeleteTask}) {
-  if(!task){
-    console.log("Task is undefined");
-    return null;
-  }
+function Task({category, text, onDelete}) {
   return (
-    <div className="task">
-      <div className="label">{task.category}</div>
-      <div className="text">{task.text}</div>
-      <button 
-      className="delete"
-      onClick={()=>onDeleteTask (task.id)}
-      >
-      X</button>
-    </div>
+    <li className="task">
+      <div className="label">{category}</div>
+      <div className="text">{text}</div>
+      <button className="delete" onClick={onDelete}>X</button>
+    </li>
   );
 }
 

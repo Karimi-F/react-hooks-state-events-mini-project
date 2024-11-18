@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import CategoryFilter from "./CategoryFilter";
 import NewTaskForm from "./NewTaskForm";
 import TaskList from "./TaskList";
@@ -9,47 +9,32 @@ console.log({ CATEGORIES, TASKS });
 
 function App() {
 
-  const[tasks,setTasks] = React.useState(
-    TASKS.map((task,index)=>({...task,id:index + 1})));
+  const [tasks ,setTasks] = useState(TASKS)
+  const [categories ] = useState(CATEGORIES)
+  const [selectedCategory, setSelectedCategory] = useState("All")
+  
+  // function that sets category and is accessible to both CategoryFilter and TaskList
+  function handleCategoryChange(category){
+    setSelectedCategory(category)
+    
+  }
+  //function that updates form 
+  function onTaskFormSubmit(newTask){
+    setTasks((prevTasks)=> [...prevTasks, newTask])
+  }
 
-  const[selectedCategory, setSelectedCategory] = React.useState("All");
-
-  const handleAddTask = (newTask) => {
-    setTasks([...tasks,{id:tasks.length+1, ...newTask}]);
-  };
-
-  const handleDeleteTask = (taskId)=> {
-    setTasks(tasks.filter((task) => task.id !== taskId));
-  };
-
-  const handleCategorySelect = (category) => {
-    setSelectedCategory(category);
-  };
-
-  const filteredTasks = tasks.filter(
-    (task) => selectedCategory === "All" || task.category === selectedCategory
-  );
-
-  console.log(filteredTasks);
 
   return (
     <div className="App">
       <h2>My tasks</h2>
-      <CategoryFilter 
-      categories={CATEGORIES}
-      selectedCategory={selectedCategory}
-      onCategorySelect={handleCategorySelect}
+      <CategoryFilter categories={categories} 
+                      selectedCategory={selectedCategory}
+                      handleCategoryChange={handleCategoryChange}
       />
-      <NewTaskForm 
-      categories={CATEGORIES}
-      onTaskFormSubmit={handleAddTask}
-      />
-      <TaskList 
-      tasks={filteredTasks}
-      onDeleteTask={handleDeleteTask}
-      />
+      <NewTaskForm onTaskFormSubmit={onTaskFormSubmit} categories={categories}/>
+      <TaskList tasks={tasks} setTasks={setTasks} selectedCategory={selectedCategory}/>
     </div>
-  );
+  )
 }
 
 export default App;

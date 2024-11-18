@@ -1,58 +1,56 @@
-import React from "react";
+import React, {useState} from "react";
+import { v4 as uuid } from "uuid"; 
 
-function NewTaskForm({categories, onTaskFormSubmit}) {
-  const [newTask, setNewTask] = React.useState({
-    text:'',
-    category: categories[1]
-  });
+function NewTaskForm({categories, onTaskFormSubmit }) {
+  const [formData, setFormData] = useState({
+    id:"",
+    text:"",
+    category:categories[0]
+  })
+  //handle onChange input of options to read values
+  function handleCategoryChange(event){
+    const {name, value} = event.target
+    setFormData(({...formData, //since you are updating two fields, destructure
+      [name]:value })) 
 
-  function handleOnChange(event) {
-    const addedTask = { ...newTask, [event.target.name]: event.target.value };
-    setNewTask(addedTask);
-
-    console.log("Here is a new task:", addedTask);
   }
+  //handle submit to post values to setFormData
+  function handleSubmit(event){
+    event.preventDefault()
+    const newTask = {
+      ...formData, 
+      id:uuid()
+    }
+    onTaskFormSubmit(newTask); //Pass new form 
+    
+     // Reset the form fields after submission
+     setFormData({
+      id: "",
+      text: "",
+      category: categories[0],  // Reset to the default category
+    });
 
-  function handleSubmit (event){
-    event.preventDefault();
-    onTaskFormSubmit(newTask);
-    setNewTask({text:'',category:categories[1]});
   }
- 
+  //loop through categories to get value for options
+  const options= categories.map((category)=>{
+    return(
+      <option key={category} value={category} >{category}</option>
+    )
+  })
+
   return (
-    <form className="new-task-form" onSubmit={handleSubmit} >
+    <form className="new-task-form" onSubmit={handleSubmit}>
       <label>
         Details
-        <input 
-        type="text" 
-        name="text" 
-        value={newTask.text}
-        onChange={handleOnChange} 
-        />
+        <input type="text" name="text" onChange={handleCategoryChange}/>
       </label>
       <label>
         Category
-        <select 
-        name="category"
-        value={newTask.category}
-        onChange={handleOnChange}
-        >
-          {categories.filter((category) => category !== "All") .map((category) => (
-            <option key={category} value={category}>{category}</option>
-          ))
-           }
-          {/* render <option> elements for each category here */}
-        {/* <option value={"All"}> All</option>
-        <option value={"Food"}>Food</option>
-        <option value={"Code"}>Code</option>
-        <option value={"Money"}>Money</option>
-        <option value={"Misc"}>Misc</option> */}
+        <select name="category" onChange={handleCategoryChange}>
+          {options}
         </select>
       </label>
-      <input 
-      type="submit" 
-      value="Add task" 
-      />
+      <input type="submit" value="Add task" />
     </form>
   );
 }
